@@ -96,14 +96,30 @@ ExprNode group(): { ExprNode e; } {
 }
 
 ExprNode mult(): { ExprNode arg1; ExprNode arg2; Token op; } {
-    arg1=group() ( ( op=<"*"> | op=<"/"> ) arg2=group() { arg1 = new BinaryOpNode(op.image, arg1, arg2); } )* { return arg1; }
+    arg1=group() ( ( op="*" | op="/" ) arg2=group() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
 }
 
 ExprNode add(): { ExprNode arg1; ExprNode arg2; Token op; } {
-    arg1=mult() ( ( op=<"+"> | op=<"-"> ) arg2=mult() { arg1 = new BinaryOpNode(op.image, arg1, arg2); } )* { return arg1; }
+    arg1=mult() ( ( op="+" | op="-" ) arg2=mult() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
 }
 
-ExprNode expr(): { ExprNode r; } { r=add() { return r; } }
+ExprNode compare1(): { ExprNode arg1; ExprNode arg2; Token op; } {
+    arg1=add() ( ( op=">"  | op=">=" | op="<" | op="<=" ) arg2=add() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
+}
+
+ExprNode compare2(): { ExprNode arg1; ExprNode arg2; Token op; } {
+    arg1=compare1() ( ( op="=="  | op="!=" ) arg2=compare1() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
+}
+
+ExprNode and(): { ExprNode arg1; ExprNode arg2; Token op; } {
+    arg1=compare2() ( ( op="&&" ) arg2=compare2() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
+}
+
+ExprNode or(): { ExprNode arg1; ExprNode arg2; Token op; } {
+    arg1=and() ( ( op="||" ) arg2=and() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
+}
+
+ExprNode expr(): { ExprNode r; } { r=or() { return r; } }
 
 AssignNode stmtAssign1(): {TypeNode type; IdentNode ident; ExprNode expr; AssignNode stmt;} {
     type=type() ident=ident() (("=" expr=expr() { stmt = new AssignNode(type, ident, expr); return stmt;}) | { stmt = new AssignNode(type, ident);  return stmt; })
@@ -119,7 +135,6 @@ StmtNode stmt1(): { StmtNode stmt; } {
         | stmt = stmtAssign2()
         | stmt=funcCall()
     )
-
     { return stmt; }
 }
 //ForNode stmtFor(): { StmtNode stmt; } {
@@ -136,9 +151,14 @@ StmtNode stmt2(): { StmtNode stmt; } {
       | { ExprNode cond = null; StmtNode body = null; }
         <WHILE> "(" cond=expr() ")" (body=stmt())?
         { stmt = new WhileNode(cond, body); }
-//      | { StmtNode start = null; ExprNode condition = null; StmtNode counter = null; StmtNode body = null; }
-//        <FOR> "("  (start=stmt1() )? ";" (condition=expr())? ";" (counter=stmt1())? ")" body=stmt()
-//        {  stmt = new ForNode(start, condition, counter, body); return stmt; }
+      | {
+            StmtNode init = new StmtListNode();
+            ExprNode cond = new LiteralNode("true");
+            StmtNode step = new StmtListNode();
+            StmtNode body;
+        }
+            <FOR> "(" (init=stmt1())? ";" (cond=expr())? ";" (step=stmt1())? ")" body=stmt()
+            { stmt = new ForNode(init, cond, step, body); }
     )
     { return stmt; }
 }

@@ -9,7 +9,16 @@ public class BinaryOpNode implements ExprNode {
         ADD("+"),
         SUB("-"),
         MUL("*"),
-        DIV("/");
+        DIV("/"),
+        LESS("<"),
+        EQUAL_OR_MORE(">="),
+        EQUAL_OR_LESS("<="),
+        NOTEQUAL("!="),
+        EQUAL("=="),
+        AND("&&"),
+        OR("||"),
+        MORE(">");
+
 
         public final String op;
 

@@ -3,47 +3,21 @@ package ru.vsu.cs.course3.compiler.ast;
 import java.util.*;
 
 public class ForNode implements ExprNode, StmtNode {
-    private StmtNode start = null;
-    private ExprNode condition = null;
-    private StmtNode counter = null;
+    private StmtNode init = null;
+    private ExprNode cond = null;
+    private StmtNode step = null;
     private StmtNode body = null;
 
-    public ForNode(StmtNode start, ExprNode condition, StmtNode counter, StmtNode body) {
-        this.start = start;
-        this.condition = condition;
-        this.counter = counter;
-        this.body = body;
-    }
-
-    public ForNode(StmtNode body) {
+    public ForNode(StmtNode init, ExprNode cond, StmtNode step, StmtNode body) {
+        this.init = init;
+        this.cond = cond;
+        this.step = step;
         this.body = body;
     }
 
     @Override
     public Collection<? extends AstNode> childs() {
-        List<AstNode> childs = Arrays.asList(body);
-        if (condition != null) {
-            System.out.println("condition " + condition);
-            childs.add(condition);
-        }
-        if (start != null) {
-            System.out.println("assign " + start);
-            childs.add(start);
-        }
-        if (counter != null)    {
-            System.out.println(counter);
-            childs.add(counter);
-        }
-//        if (condition != null)
-//            childs.add(condition);
-//        if (counter != null)
-//            childs.add(counter);
-//        if (start != null)
-//            childs.add(start);
-//        if (elseStmt != null) {
-//            childs.add(elseStmt);
-//        }
-        return childs;
+        return Arrays.asList(init, cond, step, body);
     }
 
     @Override
@@ -51,19 +25,19 @@ public class ForNode implements ExprNode, StmtNode {
         return "for";
     }
 
-    public StmtNode getCond() {
-        return start;
+    public StmtNode getInit() {
+        return init;
     }
 
-    public ExprNode getThenStmt() {
-        return condition;
+    public ExprNode getCond() {
+        return cond;
     }
 
-    public StmtNode getElseStmt() {
-        return counter;
+    public StmtNode getStep() {
+        return step;
     }
 
-    public StmtNode getStart() {
+    public StmtNode getBody() {
         return body;
     }
 }

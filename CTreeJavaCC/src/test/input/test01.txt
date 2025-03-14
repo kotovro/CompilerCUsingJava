@@ -1,4 +1,4 @@
-while (true)
+while (a > 10 || a == 1 && a < 3)
 {
     print();
 }
@@ -10,6 +10,11 @@ bool b = input(b); /* comment 1
 
 int c = input();
 */
+for(int a = 3; k < 3;)
+{
+    j = l;
+}
+
 c = a + b * (2.05 - 1) + 0;  // comment 2
 if (a) {
   a();
