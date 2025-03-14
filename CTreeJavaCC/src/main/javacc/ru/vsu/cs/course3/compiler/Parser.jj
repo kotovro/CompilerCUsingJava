@@ -1,0 +1,161 @@
+options {LOOKAHEAD = 2;}
+PARSER_BEGIN(Parser)
+
+package ru.vsu.cs.course3.compiler;
+
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.*;
+
+import ru.vsu.cs.course3.compiler.ast.*;
+
+public class Parser {
+        public static void main(String[] args) throws Exception {
+            Reader input = args.length > 0 ? new FileReader(args[0]) : new InputStreamReader(System.in);
+            Parser parser = new Parser(input);
+            AstNode result = parser.start();
+            result.printTree(System.out);
+        }
+}
+
+PARSER_END(Parser)
+
+SKIP:  {
+    <WS: " " | "\t" | "\r" | "\n" | "\r\n">
+  | <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])*>
+  | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*/">
+}
+TOKEN: {
+    <#LETTER: ["a"-"z", "A"-"Z", "_"]>
+  | <#DIGIT: ["0"-"9"]>
+}
+TOKEN: {
+    <INT_VALUE: (<DIGIT>)+>
+  | <FLOAT_VALUE: (<DIGIT>)+ "." (<DIGIT>)* | "." (<DIGIT>)+>
+  | <#ESCAPE: "\\" ["n","t","b","r","f","\\","\"","\'"]>
+  | <CHAR_VALUE: "\'" (~["\'","\\"]|<ESCAPE>) "\'">
+  | <STRING_VALUE: "\"" (~["\"","\\"]|<ESCAPE>)* "\"">
+}
+TOKEN: {
+    <IF: "if">
+  | <ELSE: "else">
+  | <TRUE: "true">
+  | <FALSE: "false">
+}
+
+TOKEN : {
+  <FOR: "for">
+  | <WHILE: "while">
+}
+TOKEN: {
+    <INT: "int">
+  | <BOOL: "bool">
+  | <CHAR: "char">
+}
+TOKEN: {
+    <IDENT: <LETTER>(<LETTER>|<DIGIT>)*>
+}
+
+ValueNode value(): { Token val; } {
+    (
+         val=<INT_VALUE>
+       | val=<FLOAT_VALUE>
+       | val=<STRING_VALUE>
+       | val=<TRUE> | val=<FALSE>
+    )
+    { return new ValueNode(val.image); }
+}
+
+IdentNode ident(): { Token ident; } { ident=<IDENT> { return new IdentNode(ident.image); } }
+
+TypeNode type(): { Token type; } {
+    (type=<INT>
+     |type=<CHAR>
+     |type=<BOOL>)
+    { return new TypeNode(type.image); }
+}
+
+List<ExprNode> params(): { List<ExprNode> params = new ArrayList<>(); ExprNode e; } {
+    (e=expr() { params.add(e); } ("," e=expr() { params.add(e); })*)?
+    { return params; }
+}
+FuncCallNode funcCall(): { IdentNode ident; List<ExprNode> params; } {
+    ident=ident() "(" params=params() ")"
+    { return new FuncCallNode(ident, params); }
+}
+
+ExprNode group(): { ExprNode e; } {
+    (
+        e=value()
+      | e=funcCall()
+      | e=ident()
+      | "(" e=expr() ")"
+    )
+    { return e; }
+}
+
+ExprNode mult(): { ExprNode arg1; ExprNode arg2; Token op; } {
+    arg1=group() ( ( op=<"*"> | op=<"/"> ) arg2=group() { arg1 = new BinaryOpNode(op.image, arg1, arg2); } )* { return arg1; }
+}
+
+ExprNode add(): { ExprNode arg1; ExprNode arg2; Token op; } {
+    arg1=mult() ( ( op=<"+"> | op=<"-"> ) arg2=mult() { arg1 = new BinaryOpNode(op.image, arg1, arg2); } )* { return arg1; }
+}
+
+ExprNode expr(): { ExprNode r; } { r=add() { return r; } }
+
+AssignNode stmtAssign1(): {TypeNode type; IdentNode ident; ExprNode expr; AssignNode stmt;} {
+    type=type() ident=ident() (("=" expr=expr() { stmt = new AssignNode(type, ident, expr); return stmt;}) | { stmt = new AssignNode(type, ident);  return stmt; })
+}
+
+AssignNode stmtAssign2(): {IdentNode ident; ExprNode expr; AssignNode stmt;} {
+    ident=ident() "=" expr=expr() { stmt = new AssignNode(ident, expr); return stmt; }
+}
+
+StmtNode stmt1(): { StmtNode stmt; } {
+    (
+        stmt = stmtAssign1()
+        | stmt = stmtAssign2()
+        | stmt=funcCall()
+    )
+
+    { return stmt; }
+}
+//ForNode stmtFor(): { StmtNode stmt; } {
+//    { StmtNode start; StmtNode condition; StmtNode counter; StmtNode body; }
+//    <FOR> "("  start=stmt()  condition=stmt() counter=stmt() body=stmt()  ")"
+//    { stmt = new ForNode(start, condition, counter, body); return stmt; }
+//}
+StmtNode stmt2(): { StmtNode stmt; } {
+    (
+        "{" stmt=stmtList() "}"
+      | { ExprNode cond; StmtNode thenStmt; StmtNode elseStmt = null; }
+        <IF> "(" cond=expr() ")" thenStmt=stmt() (<ELSE> elseStmt=stmt())?
+        { stmt = new IfNode(cond, thenStmt, elseStmt); }
+      | { ExprNode cond = null; StmtNode body = null; }
+        <WHILE> "(" cond=expr() ")" (body=stmt())?
+        { stmt = new WhileNode(cond, body); }
+//      | { StmtNode start = null; ExprNode condition = null; StmtNode counter = null; StmtNode body = null; }
+//        <FOR> "("  (start=stmt1() )? ";" (condition=expr())? ";" (counter=stmt1())? ")" body=stmt()
+//        {  stmt = new ForNode(start, condition, counter, body); return stmt; }
+    )
+    { return stmt; }
+}
+StmtNode stmt(): { StmtNode stmt; } {
+    ( stmt=stmt1() ";" | stmt=stmt2() )
+    { return stmt; }
+}
+
+StmtNode stmtList(): { List<StmtNode> list = new ArrayList<>(); } {
+    ( { StmtNode stmt; } stmt=stmt() { list.add(stmt); } )*
+    { return new StmtListNode(list); }
+}
+
+StmtNode program(): { StmtNode program; } {
+    program=stmtList() <EOF> { return program; }
+}
+
+AstNode start(): { StmtNode program; } {
+    program=program() { return program; }
+}
