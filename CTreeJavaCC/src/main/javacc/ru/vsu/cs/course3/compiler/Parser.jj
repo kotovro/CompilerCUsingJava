@@ -142,23 +142,32 @@ StmtNode stmt1(): { StmtNode stmt; } {
 //    <FOR> "("  start=stmt()  condition=stmt() counter=stmt() body=stmt()  ")"
 //    { stmt = new ForNode(start, condition, counter, body); return stmt; }
 //}
+
+WhileNode whileStmt() : { ExprNode cond = null; StmtNode body = null; } {
+        <WHILE> "(" cond=expr() ")" (body=stmt())?
+        { return new WhileNode(cond, body); }
+}
+
+ForNode forStmt() : {
+                        StmtNode init = new StmtListNode();
+                         ExprNode cond = new LiteralNode("true");
+                         StmtNode step = new StmtListNode();
+                         StmtNode body;
+                     }
+ {
+     <FOR> "(" (init=stmt1())? ";" (cond=expr())? ";" (step=stmt1())? ")" body=stmt()
+     { return new ForNode(init, cond, step, body); }
+
+ }
+
 StmtNode stmt2(): { StmtNode stmt; } {
     (
         "{" stmt=stmtList() "}"
       | { ExprNode cond; StmtNode thenStmt; StmtNode elseStmt = null; }
         <IF> "(" cond=expr() ")" thenStmt=stmt() (<ELSE> elseStmt=stmt())?
         { stmt = new IfNode(cond, thenStmt, elseStmt); }
-      | { ExprNode cond = null; StmtNode body = null; }
-        <WHILE> "(" cond=expr() ")" (body=stmt())?
-        { stmt = new WhileNode(cond, body); }
-      | {
-            StmtNode init = new StmtListNode();
-            ExprNode cond = new LiteralNode("true");
-            StmtNode step = new StmtListNode();
-            StmtNode body;
-        }
-            <FOR> "(" (init=stmt1())? ";" (cond=expr())? ";" (step=stmt1())? ")" body=stmt()
-            { stmt = new ForNode(init, cond, step, body); }
+      | stmt = whileStmt()
+      | stmt = forStmt()
     )
     { return stmt; }
 }

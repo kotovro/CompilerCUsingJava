@@ -7,17 +7,24 @@ int a = input();
 
 bool b = input(b); /* comment 1
 
-
 int c = input();
 */
-for(int a = 3; k < 3;)
+for(int a = 10; s < 10; a = a + 1)
 {
-    j = l;
+    w = l;
 }
 
 c = a + b * (2.05 - 1) + 0;  // comment 2
-if (a) {
+if (a || f <= 3) {
   a();
+} else if (h < 3) {
+    d = 4;
+    l = 4;
 }
+else {
+    q = 3;
+}
+
+
 print(c+1, "2\n23", true);
 

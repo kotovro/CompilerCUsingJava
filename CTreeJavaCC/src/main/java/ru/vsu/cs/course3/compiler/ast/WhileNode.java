@@ -15,8 +15,7 @@ public class WhileNode implements ExprNode, StmtNode {
 
     @Override
     public Collection<? extends AstNode> childs() {
-        List<AstNode> childs = Arrays.asList(cond, body);
-        return childs;
+        return Arrays.asList(cond, body);
     }
 
     @Override
