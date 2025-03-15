@@ -17,7 +17,6 @@ public class IfNode implements ExprNode, StmtNode {
     public Collection<? extends AstNode> childs() {
         List<AstNode> childs = new ArrayList<>(Arrays.asList(cond, thenStmt));
         if (elseStmt != null) {
-            System.out.println(elseStmt.childs());
             childs.add(elseStmt);
         }
         return childs;

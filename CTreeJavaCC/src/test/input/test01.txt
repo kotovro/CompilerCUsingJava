@@ -5,7 +5,11 @@ while (a > 10 || a == 1 && a < 3)
 char m;
 int a = input();
 
+float a = l;
+
+
 bool b = input(b); /* comment 1
+
 
 int c = input();
 */
