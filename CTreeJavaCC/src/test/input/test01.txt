@@ -12,13 +12,14 @@ int a = input();
 
 float a = l;
 
+a++;
 
 bool b = input(b); /* comment 1
 
 
 int c = input();
 */
-for(int a = 10; s < 10; a = a + 1)
+for(int a = 10; s < 10; a++)
 {
     w = l;
 }
