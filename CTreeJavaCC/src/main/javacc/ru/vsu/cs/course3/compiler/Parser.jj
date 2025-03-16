@@ -48,15 +48,18 @@ TOKEN : {
   <FOR: "for">
   | <WHILE: "while">
 }
+
 TOKEN: {
     <INT: "int">
   | <BOOL: "bool">
   | <CHAR: "char">
   | <FLOAT: "float">
 }
+
 TOKEN: {
     <IDENT: <LETTER>(<LETTER>|<DIGIT>)*>
 }
+
 
 ValueNode value(): { Token val; } {
     (
@@ -123,20 +126,48 @@ ExprNode or(): { ExprNode arg1; ExprNode arg2; Token op; } {
 
 ExprNode expr(): { ExprNode r; } { r=or() { return r; } }
 
-AssignNode assignWithType(): {TypeNode type; IdentNode ident; ExprNode expr; AssignNode stmt;} {
-    type=type() ident=ident() (("=" expr=expr()
-    { stmt = new AssignNode(type, ident, expr); return stmt;})
-        | { stmt = new AssignNode(type, ident);  return stmt; })
+
+AssignNode assignWithType(): {
+    TypeNode type = null;
+    IdentNode ident = null;
+    ExprNode exprRightSide, exprAssignee = null;
+    AssignNode stmt = null;
+} {
+    type = type() ident = ident()
+
+    (("=" exprRightSide = expr() { stmt = new AssignNode(type, ident, exprRightSide); })
+    /// Reactor this assignment with opeartion into separate method!
+    | ("*=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("*", ident, exprRightSide);
+                                      stmt = new AssignNode(type, ident, exprAssignee); })
+    | ("/=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("/", ident, exprRightSide);
+                                    stmt = new AssignNode(type, ident, exprAssignee); })
+    | ("-=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("-", ident, exprRightSide);
+                                          stmt = new AssignNode(type, ident, exprAssignee); })
+    | ("+=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("+", ident, exprRightSide);
+                                        stmt = new AssignNode(type, ident, exprAssignee); })
+    | { stmt = new AssignNode(type, ident);})
+    { return stmt; }
 }
 
-AssignNode aasignNoType(): {IdentNode ident; ExprNode expr; AssignNode stmt;} {
-    ident=ident() "=" expr=expr() { stmt = new AssignNode(ident, expr); return stmt; }
+
+AssignNode assignNoType(): {IdentNode ident; ExprNode exprRightSide, exprAssignee; AssignNode stmt;} {
+    ident=ident()
+    (( "=" exprRightSide=expr() { stmt = new AssignNode(ident, exprRightSide);     })
+    | ("*=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("*", ident, exprRightSide);
+                                          stmt = new AssignNode(ident, exprAssignee); })
+    | ("/=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("/", ident, exprRightSide);
+                                        stmt = new AssignNode(ident, exprAssignee); })
+    | ("-=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("-", ident, exprRightSide);
+                                              stmt = new AssignNode(ident, exprAssignee); })
+    | ("+=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("+", ident, exprRightSide);
+                                            stmt = new AssignNode(ident, exprAssignee); }))
+   { return stmt; }
 }
 
 StmtNode funcCallOrAssign(): { StmtNode stmt; } {
     (
         stmt = assignWithType()
-        | stmt = aasignNoType()
+        | stmt = assignNoType()
         | stmt=funcCall()
     )
     { return stmt; }

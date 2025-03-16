@@ -1,7 +1,9 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 public class AssignNode implements StmtNode {
     private IdentNode ident;
@@ -26,17 +28,22 @@ public class AssignNode implements StmtNode {
         this.expr = expr;
     }
 
+    public AssignNode(IdentNode ident) {
+        this.ident = ident;
+    }
     /// modified it from simple return Arrays.asList(ident, expr)
     /// By doing several if statements, we don't have to modify tree printig method - otherwise we had to add null check fo r children
     @Override
     public Collection<AstNode> childs() {
+        List<AstNode> children = new ArrayList<AstNode>();
         if (type != null) {
-            if (expr != null) {
-                return Arrays.asList(type, ident, expr);
-            }
-            return Arrays.asList(type, ident);
+            children.add(type);
         }
-        return Arrays.asList(ident, expr);
+        children.add(ident);
+        if (expr != null) {
+            children.add(expr);
+        }
+        return children;
     }
 
     @Override
