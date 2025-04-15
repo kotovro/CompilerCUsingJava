@@ -26,10 +26,16 @@ SKIP:  {
   | <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])*>
   | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*/">
 }
+
 TOKEN: {
     <#LETTER: ["a"-"z", "A"-"Z", "_"]>
   | <#DIGIT: ["0"-"9"]>
 }
+
+TOKEN: {
+    <RETURN: "return">
+}
+
 TOKEN: {
     <INT_VALUE: (<DIGIT>)+>
   | <FLOAT_VALUE: (<DIGIT>)+ "." (<DIGIT>)* | "." (<DIGIT>)+>
@@ -54,6 +60,7 @@ TOKEN: {
   | <BOOL: "bool">
   | <CHAR: "char">
   | <FLOAT: "float">
+  | <VOID: "void">
 }
 
 TOKEN: {
@@ -77,7 +84,8 @@ TypeNode type(): { Token type; } {
     (type=<INT>
      |type=<CHAR>
      |type=<BOOL>
-     |type=<FLOAT>)
+     |type=<FLOAT>
+     |type=<VOID>)
     { return new TypeNode(type.image); }
 }
 
@@ -85,6 +93,7 @@ List<ExprNode> params(): { List<ExprNode> params = new ArrayList<>(); ExprNode e
     (e=expr() { params.add(e); } ("," e=expr() { params.add(e); })*)?
     { return params; }
 }
+
 FuncCallNode funcCall(): { IdentNode ident; List<ExprNode> params; } {
     ident=ident() "(" params=params() ")"
     { return new FuncCallNode(ident, params); }
@@ -99,7 +108,7 @@ ExprNode group(): { ExprNode e; } {
     )
     { return e; }
 }
-
+//pre ibncrement and decrement here
 ExprNode mult(): { ExprNode arg1; ExprNode arg2; Token op; } {
     arg1=group() ( ( op="*" | op="/" ) arg2=group() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
 }
@@ -123,10 +132,11 @@ ExprNode and(): { ExprNode arg1; ExprNode arg2; Token op; } {
 ExprNode or(): { ExprNode arg1; ExprNode arg2; Token op; } {
     arg1=and() ( ( op="||" ) arg2=and() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
 }
+// post incremetn and decrement
 
 ExprNode expr(): { ExprNode r; } { r=or() { return r; } }
 
-
+// findo out if c allows *= and sucj operations
 AssignNode assignWithType(): {
     TypeNode type = null;
     IdentNode ident = null;
@@ -222,15 +232,36 @@ StmtNode blockAndOneLineStmt(): { StmtNode stmt; } {
     { return stmt; }
 }
 
+FunctionParamDeclarationNode functionDeclarationParam(): { TypeNode type; IdentNode name; }
+{
+    type = type() name = ident()
+    { return new FunctionParamDeclarationNode(type, name); }
+}
+
+List<FunctionParamDeclarationNode> functionDeclarationParams(): { List<FunctionParamDeclarationNode> params = new ArrayList<>(); FunctionParamDeclarationNode e; } {
+    (e=functionDeclarationParam() { params.add(e); } ("," e=functionDeclarationParam() { params.add(e); })*)?
+    { return params; }
+}
+
+FunctionDeclarationNode funcDeclaration():
+    { TypeNode type; IdentNode name; List<FunctionParamDeclarationNode> params = null; StmtNode body; }
+{
+    type = type() name = ident() "(" params = functionDeclarationParams() ")" body = blockStmt()
+
+    { return new FunctionDeclarationNode(type, name, params, body); }
+}
+
+
 StmtNode listStmt(): { List<StmtNode> list = new ArrayList<>(); } {
     ( { StmtNode stmt; } stmt=blockAndOneLineStmt() { list.add(stmt); } )*
     { return new StmtListNode(list); }
 }
 
-StmtNode program(): { StmtNode program; } {
-    program=listStmt() <EOF> { return program; }
+StmtListNode program(): { StmtNode e; StmtListNode program = new StmtListNode(); } {
+    (LOOKAHEAD(3) ( e=funcDeclaration()  { program.stmts.add(e); }) |
+        (e=assignWithType() ";" { program.stmts.add(e); }))+  { return program; }
 }
 
-AstNode start(): { StmtNode program; } {
+AstNode start(): { StmtListNode program; } {
     program=program() { return program; }
 }
