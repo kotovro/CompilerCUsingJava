@@ -111,9 +111,9 @@ ExprNode group(): { ExprNode e; } {
 //pre ibncrement and decrement here
 
 
-ExprNode postIncrementOrDecrement(): {  ExprNode arg = null;  Token op = null; } {
-       arg = group()
-       [ op = "++" | op = "--" ]
+ExprNode preIncrementOrDecrement(): {  ExprNode arg = null;  Token op = null; } {
+   [ op = "++" | op = "--" ]
+   arg = group()
        {
               if (op != null) {
                   return new UnaryOperationNode(op.toString(), arg, true);
@@ -124,7 +124,7 @@ ExprNode postIncrementOrDecrement(): {  ExprNode arg = null;  Token op = null; }
 }
 
 ExprNode mult(): { ExprNode arg1; ExprNode arg2; Token op; } {
-    arg1=postIncrementOrDecrement() ( ( op="*" | op="/" ) arg2=postIncrementOrDecrement() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
+    arg1=preIncrementOrDecrement() ( ( op="*" | op="/" ) arg2=postIncrementOrDecrement() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
 }
 
 ExprNode add(): { ExprNode arg1; ExprNode arg2; Token op; } {
@@ -147,9 +147,10 @@ ExprNode or(): { ExprNode arg1; ExprNode arg2; Token op; } {
     arg1=and() ( ( op="||" ) arg2=and() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
 }
 
-ExprNode preIncrementOrDecrement(): {  ExprNode arg = null;  Token op = null; } {
-   [ op = "++" | op = "--" ]
+ExprNode postIncrementOrDecrement(): {  ExprNode arg = null;  Token op = null; } {
    arg = or()
+   [ op = "++" | op = "--" ]
+
        {
               if (op != null) {
                   return new UnaryOperationNode(op.toString(), arg, false);
@@ -158,10 +159,9 @@ ExprNode preIncrementOrDecrement(): {  ExprNode arg = null;  Token op = null; } 
               }
        }
 }
-// post incremetn and decrement
 
 
-ExprNode expr(): { ExprNode r; } { r=preIncrementOrDecrement() { return r; } }
+ExprNode expr(): { ExprNode r; } { r=postIncrementOrDecrement() { return r; } }
 
 // findo out if c allows *= and sucj operations
 AssignNode assignWithType(): {
