@@ -5,10 +5,10 @@ import java.util.*;
 public class ForNode implements ExprNode, StmtNode {
     private StmtNode init = null;
     private ExprNode cond = null;
-    private StmtNode step = null;
+    private ExprNode step = null;
     private StmtNode body = null;
 
-    public ForNode(StmtNode init, ExprNode cond, StmtNode step, StmtNode body) {
+    public ForNode(StmtNode init, ExprNode cond, ExprNode step, StmtNode body) {
         this.init = init;
         this.cond = cond;
         this.step = step;
@@ -17,7 +17,19 @@ public class ForNode implements ExprNode, StmtNode {
 
     @Override
     public Collection<? extends AstNode> childs() {
-        return Arrays.asList(init, cond, step, body);
+        List<AstNode> nodes = new ArrayList<>();
+        nodes.add(body);
+        if (init != null) {
+            nodes.add(init);
+        }
+        if (cond != null) {
+            nodes.add(cond);
+        }
+        if (step != null) {
+            nodes.add(step);
+        }
+
+        return nodes;
     }
 
     @Override
@@ -33,7 +45,7 @@ public class ForNode implements ExprNode, StmtNode {
         return cond;
     }
 
-    public StmtNode getStep() {
+    public ExprNode getStep() {
         return step;
     }
 

@@ -3,19 +3,15 @@ package ru.vsu.cs.course3.compiler.ast;
 import java.util.*;
 
 public class AssignNode implements StmtNode {
+    private TypeNode type = null;
     private IdentNode ident = null;
     private ExprNode expr = null;
-    private TypeNode type = null;
+
 
     public AssignNode(TypeNode type, IdentNode ident, ExprNode expr) {
         this.type = type;
         this.ident = ident;
         this.expr = expr;
-    }
-
-    public AssignNode(TypeNode type, IdentNode ident) {
-        this.type = type;
-        this.ident = ident;
     }
 
     public AssignNode(IdentNode ident, ExprNode expr) {

@@ -19,7 +19,7 @@ public class FunctionDeclarationNode implements StmtNode {
 
     @Override
     public String toString() {
-        return "function";
+        return "function " + this.name ;
     }
 
     @Override

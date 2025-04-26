@@ -109,8 +109,22 @@ ExprNode group(): { ExprNode e; } {
     { return e; }
 }
 //pre ibncrement and decrement here
+
+
+ExprNode postIncrementOrDecrement(): {  ExprNode arg = null;  Token op = null; } {
+       arg = group()
+       [ op = "++" | op = "--" ]
+       {
+              if (op != null) {
+                  return new UnaryOperationNode(op.toString(), arg, true);
+              } else {
+                  return arg;
+              }
+       }
+}
+
 ExprNode mult(): { ExprNode arg1; ExprNode arg2; Token op; } {
-    arg1=group() ( ( op="*" | op="/" ) arg2=group() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
+    arg1=postIncrementOrDecrement() ( ( op="*" | op="/" ) arg2=postIncrementOrDecrement() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
 }
 
 ExprNode add(): { ExprNode arg1; ExprNode arg2; Token op; } {
@@ -132,65 +146,62 @@ ExprNode and(): { ExprNode arg1; ExprNode arg2; Token op; } {
 ExprNode or(): { ExprNode arg1; ExprNode arg2; Token op; } {
     arg1=and() ( ( op="||" ) arg2=and() { arg1 = new BinaryOpNode(op.toString(), arg1, arg2); } )* { return arg1; }
 }
+
+ExprNode preIncrementOrDecrement(): {  ExprNode arg = null;  Token op = null; } {
+   [ op = "++" | op = "--" ]
+   arg = or()
+       {
+              if (op != null) {
+                  return new UnaryOperationNode(op.toString(), arg, false);
+              } else {
+                  return arg;
+              }
+       }
+}
 // post incremetn and decrement
 
-ExprNode expr(): { ExprNode r; } { r=or() { return r; } }
+
+ExprNode expr(): { ExprNode r; } { r=preIncrementOrDecrement() { return r; } }
 
 // findo out if c allows *= and sucj operations
 AssignNode assignWithType(): {
     TypeNode type = null;
     IdentNode ident = null;
-    ExprNode exprRightSide, exprAssignee = null;
+    ExprNode expr = null;
     AssignNode stmt = null;
-} {
-    type = type() ident = ident()
+}
+{
+  type = type() ident = ident() "=" expr = expr()
+  {
+      return new AssignNode(type, ident, expr);
+  }
 
-    (("=" exprRightSide = expr() { stmt = new AssignNode(type, ident, exprRightSide); })
-    /// Reactor this assignment with opeartion into separate method!
-    | ("*=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("*", ident, exprRightSide);
-                                      stmt = new AssignNode(type, ident, exprAssignee); })
-    | ("/=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("/", ident, exprRightSide);
-                                    stmt = new AssignNode(type, ident, exprAssignee); })
-    | ("-=" exprRightSide = add() { exprAssignee = new BinaryOpNode("-", ident, exprRightSide);
-                                          stmt = new AssignNode(type, ident, exprAssignee); })
-    | ("+=" exprRightSide = add() { exprAssignee = new BinaryOpNode("+", ident, exprRightSide);
-                                        stmt = new AssignNode(type, ident, exprAssignee); })
-    | ("++" {    exprRightSide = new IdentNode("1");
-                exprAssignee = new BinaryOpNode("+", ident, exprRightSide);
-                                              stmt = new AssignNode(type, ident, exprAssignee); })
-    | ("--" {    exprRightSide = new IdentNode("1");
-                  exprAssignee = new BinaryOpNode("-", ident, exprRightSide);
-                                                stmt = new AssignNode(type, ident, exprAssignee); })
-    | { stmt = new AssignNode(type, ident);})
-    { return stmt; }
 }
 
+AssignNode assignWithOperation(): { IdentNode ident = null; Token op = null; ExprNode expr = null; }
+{
+        ident = ident() ( op="*=" | op="/=" | op="-=" | op="+=" ) expr = expr()
+        { expr = new BinaryOpNode("" + op.toString().charAt(0), ident, expr); return new AssignNode(ident, expr); }
+}
 
 AssignNode assignNoType(): {IdentNode ident; ExprNode exprRightSide, exprAssignee; AssignNode stmt;} {
-    ident=ident()
-    (( "=" exprRightSide=expr() { stmt = new AssignNode(ident, exprRightSide);     })
-    | ("*=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("*", ident, exprRightSide);
-                                          stmt = new AssignNode(ident, exprAssignee); })
-    | ("/=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("/", ident, exprRightSide);
-                                        stmt = new AssignNode(ident, exprAssignee); })
-    | ("-=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("-", ident, exprRightSide);
-                                              stmt = new AssignNode(ident, exprAssignee); })
-    | ("+=" exprRightSide = mult() { exprAssignee = new BinaryOpNode("+", ident, exprRightSide);
-                                            stmt = new AssignNode(ident, exprAssignee); })
-    | ("++" {    exprRightSide = new IdentNode("1");
-                    exprAssignee = new BinaryOpNode("+", ident, exprRightSide);
-                                                  stmt = new AssignNode(ident, exprAssignee); })
-    | ("--" {    exprRightSide = new IdentNode("1");
-                        exprAssignee = new BinaryOpNode("-", ident, exprRightSide);
-                                                      stmt = new AssignNode(ident, exprAssignee); }))
-   { return stmt; }
+    ident=ident()  "=" exprRightSide=expr()
+   { stmt = new AssignNode(ident, exprRightSide);  return stmt; }
 }
 
-StmtNode funcCallOrAssign(): { StmtNode stmt; } {
+VariableDeclarationNode variableDeclaration(): {TypeNode type = null; IdentNode ident = null;}
+{
+    type = type() ident=ident()
+    { return new VariableDeclarationNode(type, ident); }
+}
+
+StmtNode assign(): { StmtNode stmt; } {
     (
+
         stmt = assignWithType()
         | stmt = assignNoType()
-        | stmt=funcCall()
+        | stmt = assignWithOperation()
+
     )
     { return stmt; }
 }
@@ -201,15 +212,14 @@ WhileNode whileStmt() : { ExprNode cond = null; StmtNode body = null; } {
 }
 
 ForNode forStmt() : {
-                        StmtNode init = new StmtListNode();
+                         StmtNode init = null;
                          ExprNode cond = new LiteralNode("true");
-                         StmtNode step = new StmtListNode();
+                         ExprNode step = null;
                          StmtNode body;
                      }
  {
-     <FOR> "(" (init=funcCallOrAssign())? ";" (cond=expr())? ";" (step=funcCallOrAssign())? ")" body=blockAndOneLineStmt()
+     <FOR> "(" (init=assign())? ";" (cond=expr())? ";" (step=expr())? ")" body=blockAndOneLineStmt()
      { return new ForNode(init, cond, step, body); }
-
  }
 
  IfNode ifStmt() : { ExprNode cond; StmtNode thenStmt; StmtNode elseStmt = null; } {
@@ -217,6 +227,10 @@ ForNode forStmt() : {
          { return new IfNode(cond, thenStmt, elseStmt); }
  }
 
+StmtNode listStmt(): { List<StmtNode> list = new ArrayList<>(); } {
+    ( { StmtNode stmt; } stmt=blockAndOneLineStmt() { list.add(stmt); } )*
+    { return new StmtListNode(list); }
+}
 
 StmtNode blockStmt(): { StmtNode stmt; } {
     (
@@ -227,8 +241,14 @@ StmtNode blockStmt(): { StmtNode stmt; } {
     )
     { return stmt; }
 }
+
 StmtNode blockAndOneLineStmt(): { StmtNode stmt; } {
-    ( stmt=funcCallOrAssign() ";" | stmt=blockStmt() )
+    (
+            LOOKAHEAD(5) stmt = variableDeclaration() ";"
+                    | LOOKAHEAD(5) stmt = assign() ";"
+                    | LOOKAHEAD(5) stmt = funcCall() ";"
+                    | stmt = blockStmt()
+    )
     { return stmt; }
 }
 
@@ -243,23 +263,25 @@ List<FunctionParamDeclarationNode> functionDeclarationParams(): { List<FunctionP
     { return params; }
 }
 
-FunctionDeclarationNode funcDeclaration():
-    { TypeNode type; IdentNode name; List<FunctionParamDeclarationNode> params = null; StmtNode body; }
+ReturnNode returnStmt():
+{ ExprNode expression = null; }
 {
-    type = type() name = ident() "(" params = functionDeclarationParams() ")" body = blockStmt()
+  expression = expr()
+
+  { return new ReturnNode(expression); }
+}
+FunctionDeclarationNode funcDeclaration():
+    { TypeNode type; IdentNode name; List<FunctionParamDeclarationNode> params = null; StmtNode body; ReturnNode returnNode = null; }
+{
+    type = type() name = ident() "(" params = functionDeclarationParams() ")" body = blockStmt() (returnNode = returnStmt())?
 
     { return new FunctionDeclarationNode(type, name, params, body); }
 }
 
-
-StmtNode listStmt(): { List<StmtNode> list = new ArrayList<>(); } {
-    ( { StmtNode stmt; } stmt=blockAndOneLineStmt() { list.add(stmt); } )*
-    { return new StmtListNode(list); }
-}
-
 StmtListNode program(): { StmtNode e; StmtListNode program = new StmtListNode(); } {
-    (LOOKAHEAD(3) ( e=funcDeclaration()  { program.stmts.add(e); }) |
-        (e=assignWithType() ";" { program.stmts.add(e); }))+  { return program; }
+    (LOOKAHEAD(3) ( e=funcDeclaration()  { program.stmts.add(e); })
+                  |(e=assignWithType() ";" { program.stmts.add(e); }))+
+                  { return program; }
 }
 
 AstNode start(): { StmtListNode program; } {
