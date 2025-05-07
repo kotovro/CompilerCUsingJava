@@ -207,7 +207,7 @@ StmtNode assign(): { StmtNode stmt; } {
 }
 
 WhileNode whileStmt() : { ExprNode cond = null; StmtNode body = null; } {
-        <WHILE> "(" cond=expr() ")" (body=blockAndOneLineStmt())?
+        <WHILE> "(" cond=expr() ")" (body=blockStmt() )?
         { return new WhileNode(cond, body); }
 }
 
@@ -218,39 +218,34 @@ ForNode forStmt() : {
                          StmtNode body;
                      }
  {
-     <FOR> "(" (init=assign())? ";" (cond=expr())? ";" (step=expr())? ")" body=blockAndOneLineStmt()
+     <FOR> "(" (init=assign())? ";" (cond=expr())? ";" (step=expr())? ")" body=blockStmt()
      { return new ForNode(init, cond, step, body); }
  }
 
  IfNode ifStmt() : { ExprNode cond; StmtNode thenStmt; StmtNode elseStmt = null; } {
-        <IF> "(" cond=expr() ")" thenStmt=blockAndOneLineStmt() (<ELSE> elseStmt=blockAndOneLineStmt())?
+        <IF> "(" cond=expr() ")" thenStmt=blockStmt() (<ELSE> elseStmt=blockStmt())?
          { return new IfNode(cond, thenStmt, elseStmt); }
  }
 
 StmtNode listStmt(): { List<StmtNode> list = new ArrayList<>(); } {
-    ( { StmtNode stmt; } stmt=blockAndOneLineStmt() { list.add(stmt); } )*
+    ( { StmtNode stmt; } stmt=blockStmt() { list.add(stmt); } )*
     { return new StmtListNode(list); }
 }
 
 StmtNode blockStmt(): { StmtNode stmt; } {
     (
-        "{" stmt=listStmt() "}"
+        "{" stmt=listStmt()  "}"
       | stmt = ifStmt()
       | stmt = whileStmt()
       | stmt = forStmt()
+      | LOOKAHEAD(5) stmt = variableDeclaration() ";"
+      | LOOKAHEAD(5) stmt = returnStmt() ";"
+      | LOOKAHEAD(5) stmt = assign() ";"
+      | LOOKAHEAD(5) stmt = funcCall() ";"
     )
     { return stmt; }
 }
 
-StmtNode blockAndOneLineStmt(): { StmtNode stmt; } {
-    (
-            LOOKAHEAD(5) stmt = variableDeclaration() ";"
-                    | LOOKAHEAD(5) stmt = assign() ";"
-                    | LOOKAHEAD(5) stmt = funcCall() ";"
-                    | stmt = blockStmt()
-    )
-    { return stmt; }
-}
 
 FunctionParamDeclarationNode functionDeclarationParam(): { TypeNode type; IdentNode name; }
 {
@@ -266,14 +261,14 @@ List<FunctionParamDeclarationNode> functionDeclarationParams(): { List<FunctionP
 ReturnNode returnStmt():
 { ExprNode expression = null; }
 {
-  expression = expr()
+  "RETURN" expression = expr()
 
   { return new ReturnNode(expression); }
 }
 FunctionDeclarationNode funcDeclaration():
     { TypeNode type; IdentNode name; List<FunctionParamDeclarationNode> params = null; StmtNode body; ReturnNode returnNode = null; }
 {
-    type = type() name = ident() "(" params = functionDeclarationParams() ")" body = blockStmt() (returnNode = returnStmt())?
+    type = type() name = ident() "(" params = functionDeclarationParams() ")" body = blockStmt()
 
     { return new FunctionDeclarationNode(type, name, params, body); }
 }
@@ -285,5 +280,5 @@ StmtListNode program(): { StmtNode e; StmtListNode program = new StmtListNode();
 }
 
 AstNode start(): { StmtListNode program; } {
-    program=program() { return program; }
+    program=program() <EOF> { return program; }
 }

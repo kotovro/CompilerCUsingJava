@@ -1,6 +1,6 @@
 package ru.vsu.cs.course3.compiler.ast;
 
-public class ReturnNode implements ExprNode {
+public class ReturnNode implements ExprNode, StmtNode {
     ExprNode expr;
 
     public ReturnNode(ExprNode expr) {
