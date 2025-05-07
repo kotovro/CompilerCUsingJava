@@ -1,6 +1,8 @@
 package ru.vsu.cs.course3.compiler.ast;
 
-public class IdentNode implements ExprNode {
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
+public class IdentNode extends BasicNode implements ExprNode {
     private String name;
 
     public IdentNode(String name) {
@@ -14,5 +16,15 @@ public class IdentNode implements ExprNode {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
     }
 }

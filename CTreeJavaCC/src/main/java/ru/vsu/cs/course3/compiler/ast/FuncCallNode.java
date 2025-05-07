@@ -1,8 +1,10 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
 import java.util.*;
 
-public class FuncCallNode implements ExprNode, StmtNode {
+public class FuncCallNode extends BasicNode implements ExprNode, StmtNode {
     private IdentNode func = null;
     private List<ExprNode> params = null;
 
@@ -15,7 +17,7 @@ public class FuncCallNode implements ExprNode, StmtNode {
     }
 
     @Override
-    public Collection<? extends ExprNode> childs() {
+    public Collection<? extends AstNode> childs() {
         return params;
     }
 
@@ -26,5 +28,15 @@ public class FuncCallNode implements ExprNode, StmtNode {
 
     public List<ExprNode> getParams() {
         return Collections.unmodifiableList(params);
+    }
+
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
     }
 }

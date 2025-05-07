@@ -1,8 +1,10 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
 import java.util.*;
 
-public class AssignNode implements StmtNode {
+public class AssignNode extends BasicNode implements StmtNode {
     private TypeNode type = null;
     private IdentNode ident = null;
     private ExprNode expr = null;
@@ -47,5 +49,15 @@ public class AssignNode implements StmtNode {
 
     public ExprNode getExpr() {
         return expr;
+    }
+
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
     }
 }

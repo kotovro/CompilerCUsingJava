@@ -1,10 +1,11 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
-public class WhileNode implements ExprNode, StmtNode {
+public class WhileNode extends BasicNode implements ExprNode, StmtNode {
     private ExprNode cond = null;
     private StmtNode body = null;
 
@@ -31,4 +32,13 @@ public class WhileNode implements ExprNode, StmtNode {
         return body;
     }
 
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
+    }
 }

@@ -1,10 +1,12 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class VariableDeclarationNode implements StmtNode {
+public class VariableDeclarationNode extends BasicNode implements StmtNode {
 
     TypeNode type;
     IdentNode identifier;
@@ -33,5 +35,15 @@ public class VariableDeclarationNode implements StmtNode {
     @Override
     public String toString() {
         return "=";
+    }
+
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
     }
 }

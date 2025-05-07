@@ -1,10 +1,14 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
+import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 
-public class FunctionDeclarationNode implements StmtNode {
+public class FunctionDeclarationNode extends BasicNode implements StmtNode {
     private TypeNode type;
     private IdentNode name;
     private List<FunctionParamDeclarationNode> params;
@@ -23,10 +27,10 @@ public class FunctionDeclarationNode implements StmtNode {
     }
 
     @Override
-    public List<? extends AstNode> childs() {
+    public List<AstNode> childs() {
         return Collections.singletonList(body);
-//        List<AstNode> astNodes = new ArrayList<>();
-//        List<AstNode> groupNodes = new ArrayList<>();
+//        List<BasicNode> astNodes = new ArrayList<>();
+//        List<BasicNode> groupNodes = new ArrayList<>();
 //        groupNodes.add(this.name);
 //        astNodes.add(new GroupNode(this.type.toString(), groupNodes));
 //        astNodes.add(new GroupNode("params", new ArrayList<>(this.params)));
@@ -64,5 +68,21 @@ public class FunctionDeclarationNode implements StmtNode {
 
     public void setBody(StmtListNode body) {
         this.body = body;
+    }
+
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
+    }
+
+
+    @Override
+    public void printTree(PrintStream printStream) {
+
     }
 }

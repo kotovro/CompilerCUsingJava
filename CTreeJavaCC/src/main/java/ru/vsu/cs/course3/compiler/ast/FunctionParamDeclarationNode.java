@@ -1,6 +1,8 @@
 package ru.vsu.cs.course3.compiler.ast;
 
-public class FunctionParamDeclarationNode implements AstNode {
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
+public class FunctionParamDeclarationNode extends BasicNode implements AstNode{
     private TypeNode type;
     private IdentNode identifier;
 
@@ -17,4 +19,13 @@ public class FunctionParamDeclarationNode implements AstNode {
         return identifier;
     }
 
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
+    }
 }

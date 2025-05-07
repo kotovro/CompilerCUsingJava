@@ -1,8 +1,10 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
 import java.util.*;
 
-public class IfNode implements ExprNode, StmtNode {
+public class IfNode extends BasicNode implements ExprNode, StmtNode {
     private ExprNode cond = null;
     private StmtNode thenStmt = null;
     private StmtNode elseStmt = null;
@@ -14,7 +16,7 @@ public class IfNode implements ExprNode, StmtNode {
     }
 
     @Override
-    public Collection<? extends AstNode> childs() {
+    public Collection<AstNode> childs() {
         List<AstNode> childs = new ArrayList<>(Arrays.asList(cond, thenStmt));
         if (elseStmt != null) {
             childs.add(elseStmt);
@@ -37,5 +39,16 @@ public class IfNode implements ExprNode, StmtNode {
 
     public StmtNode getElseStmt() {
         return elseStmt;
+    }
+
+    @Override
+    public void semanticCheck() {
+        super.semanticCheck();
+        elseStmt.semanticCheck();
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
     }
 }

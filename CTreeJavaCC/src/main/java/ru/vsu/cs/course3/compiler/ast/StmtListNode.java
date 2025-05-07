@@ -1,8 +1,10 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
 import java.util.*;
 
-public class StmtListNode implements StmtNode {
+public class StmtListNode extends BasicNode implements StmtNode {
     public List<StmtNode> stmts = new ArrayList<>();
 
     public StmtListNode(Collection<StmtNode> stmts) {
@@ -29,4 +31,14 @@ public class StmtListNode implements StmtNode {
         return Collections.unmodifiableList(stmts);
     }
     public void setStmts(List<StmtNode> stmts) {}
+
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
+    }
 }

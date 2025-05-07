@@ -1,8 +1,11 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
+import java.io.PrintStream;
 import java.util.*;
 
-public class ForNode implements ExprNode, StmtNode {
+public class ForNode extends BasicNode implements ExprNode, StmtNode {
     private StmtNode init = null;
     private ExprNode cond = null;
     private ExprNode step = null;
@@ -51,5 +54,22 @@ public class ForNode implements ExprNode, StmtNode {
 
     public StmtNode getBody() {
         return body;
+    }
+
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
+    }
+
+
+
+    @Override
+    public void printTree(PrintStream printStream) {
+
     }
 }

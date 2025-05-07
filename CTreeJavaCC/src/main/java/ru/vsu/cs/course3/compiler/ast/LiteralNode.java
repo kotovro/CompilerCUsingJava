@@ -1,6 +1,8 @@
 package ru.vsu.cs.course3.compiler.ast;
 
-public class LiteralNode implements ExprNode {
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
+public class LiteralNode extends BasicNode implements ExprNode {
     private String str;
     private Object value;
 
@@ -24,5 +26,15 @@ public class LiteralNode implements ExprNode {
 
     public Object getValue() {
         return value;
+    }
+
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
     }
 }

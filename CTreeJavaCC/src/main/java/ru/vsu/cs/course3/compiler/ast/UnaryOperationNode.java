@@ -1,9 +1,21 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
 import java.util.Arrays;
 import java.util.Collection;
 
-public class UnaryOperationNode implements ExprNode, StmtNode{
+public class UnaryOperationNode extends BasicNode implements ExprNode, StmtNode{
+    @Override
+    public void semanticCheck() {
+
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+
+    }
+
     public static enum UnOp {
         ADD("++"),
         SUB("--");

@@ -1,49 +1,36 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Scope;
+
 import java.util.Arrays;
 import java.util.Collection;
 
-public class BinaryOpNode implements ExprNode {
+public class BinaryOpNode extends BasicNode implements ExprNode {
 
-    public static enum BinOp {
-        ADD("+"),
-        SUB("-"),
-        MUL("*"),
-        DIV("/"),
-        LESS("<"),
-        EQUAL_OR_MORE(">="),
-        EQUAL_OR_LESS("<="),
-        NOTEQUAL("!="),
-        EQUAL("=="),
-        AND("&&"),
-        OR("||"),
-        MORE(">");
+    @Override
+    public void semanticCheck() {
 
-
-        public final String op;
-
-        BinOp(String op) {
-            this.op = op;
-        }
-
-        @Override
-        public String toString() {
-            return op;
-        }
     }
 
-    private BinOp op;
-    private AstNode arg1;
-    private AstNode arg2;
+    @Override
+    public void initialize(Scope scope) {
+
+    }
+
+    public static BinaryOperator BinOp;
+
+    private BinaryOperator op;
+    private ExprNode arg1;
+    private ExprNode arg2;
 
     public BinaryOpNode(String op, ExprNode arg1, ExprNode arg2) {
-        this.op = Arrays.stream(BinOp.values()).filter(x -> x.op.equals(op)).findFirst().get();
+        this.op = Arrays.stream(BinaryOperator.values()).filter(x -> x.toString().equals(op)).findFirst().get();
         this.arg1 = arg1;
         this.arg2 = arg2;
     }
 
     @Override
-    public Collection<AstNode> childs() {
+    public Collection<ExprNode> childs() {
         return Arrays.asList(arg1, arg2);
     }
 
@@ -52,15 +39,15 @@ public class BinaryOpNode implements ExprNode {
         return op.toString();
     }
 
-    public BinOp getOp() {
+    public BinaryOperator getOp() {
         return op;
     }
 
-    public AstNode getArg1() {
+    public ExprNode getArg1() {
         return arg1;
     }
 
-    public AstNode getArg2() {
+    public ExprNode getArg2() {
         return arg2;
     }
 }
