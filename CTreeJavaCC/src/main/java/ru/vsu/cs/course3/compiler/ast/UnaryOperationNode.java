@@ -16,6 +16,11 @@ public class UnaryOperationNode extends BasicNode implements ExprNode, StmtNode{
 
     }
 
+    @Override
+    public Type getType() {
+        return null;
+    }
+
     public static enum UnOp {
         ADD("++"),
         SUB("--");

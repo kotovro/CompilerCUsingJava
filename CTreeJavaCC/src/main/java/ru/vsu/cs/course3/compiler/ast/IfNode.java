@@ -1,6 +1,8 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.exceptions.SemanticException;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
+import ru.vsu.cs.course3.compiler.semantic.TypeConvertibility;
 
 import java.util.*;
 
@@ -43,12 +45,20 @@ public class IfNode extends BasicNode implements ExprNode, StmtNode {
 
     @Override
     public void semanticCheck() {
-        super.semanticCheck();
+        cond.semanticCheck();
+        if (!cond.getType().equals(Type.BOOLEAN) && !TypeConvertibility.canConvert(cond.getType(), Type.BOOLEAN)) {
+            throw new SemanticException("If condition should be boolean");
+        }
         elseStmt.semanticCheck();
     }
 
     @Override
     public void initialize(Scope scope) {
 
+    }
+
+    @Override
+    public Type getType() {
+        return null; //not needed
     }
 }

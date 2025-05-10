@@ -1,5 +1,6 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.NonOverlappingScope;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
 
 import java.util.*;
@@ -34,11 +35,16 @@ public class StmtListNode extends BasicNode implements StmtNode {
 
     @Override
     public void semanticCheck() {
-
+        for (StmtNode statement : stmts) {
+            statement.semanticCheck();
+        }
     }
 
     @Override
     public void initialize(Scope scope) {
-
+        this.scope = new NonOverlappingScope(scope);
+        for (StmtNode stmt : stmts) {
+            stmt.initialize(this.scope);
+        }
     }
 }

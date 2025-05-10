@@ -1,27 +1,18 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.exceptions.SemanticException;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
+import ru.vsu.cs.course3.compiler.semantic.TypeConvertibility;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 public class BinaryOpNode extends BasicNode implements ExprNode {
 
-    @Override
-    public void semanticCheck() {
-
-    }
-
-    @Override
-    public void initialize(Scope scope) {
-
-    }
-
-    public static BinaryOperator BinOp;
-
     private BinaryOperator op;
     private ExprNode arg1;
     private ExprNode arg2;
+    Type type = Type.VOID;
 
     public BinaryOpNode(String op, ExprNode arg1, ExprNode arg2) {
         this.op = Arrays.stream(BinaryOperator.values()).filter(x -> x.toString().equals(op)).findFirst().get();
@@ -49,5 +40,46 @@ public class BinaryOpNode extends BasicNode implements ExprNode {
 
     public ExprNode getArg2() {
         return arg2;
+    }
+
+
+    @Override
+    public void semanticCheck() {
+        arg1.semanticCheck();
+        arg2.semanticCheck();
+
+        for (var types : op.supportableTypes()) {
+            if (arg1.getType().equals(types.typeLeft) && arg2.getType().equals(types.typeRight)) {
+                type = op.getReturnType(arg1.getType(), arg2.getType());
+                return;
+            }
+        }
+
+        for (var types : op.supportableTypes()) {
+            if ((arg1.getType().equals(types.typeLeft) || (TypeConvertibility.canConvert(arg1.getType(), types.typeLeft)))
+                    && (arg2.getType().equals(types.typeRight) || TypeConvertibility.canConvert(arg2.getType(), types.typeRight))) {
+                if (!arg1.getType().equals(types.typeLeft)) {
+                    arg1 = new CastNode(types.typeLeft, arg1, scope);
+                }
+                if (!arg2.getType().equals(types.typeLeft)) {
+                    arg2 = new CastNode(types.typeRight, arg2, scope);
+                }
+
+                type = op.getReturnType(arg1.getType(), arg2.getType());
+                return;
+            }
+        }
+        throw new SemanticException("Operation " + op.name() + " is not supported with " + arg1.getType() + " and " + arg2.getType());
+    }
+
+    @Override
+    public void initialize(Scope scope) {
+        this.scope = scope;
+    }
+
+
+    @Override
+    public Type getType() {
+        return type;
     }
 }

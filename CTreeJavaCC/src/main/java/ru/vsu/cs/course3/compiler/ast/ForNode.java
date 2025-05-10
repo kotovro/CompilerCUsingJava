@@ -5,7 +5,7 @@ import ru.vsu.cs.course3.compiler.semantic.Scope;
 import java.io.PrintStream;
 import java.util.*;
 
-public class ForNode extends BasicNode implements ExprNode, StmtNode {
+public class ForNode extends BasicNode implements StmtNode {
     private StmtNode init = null;
     private ExprNode cond = null;
     private ExprNode step = null;
@@ -58,6 +58,9 @@ public class ForNode extends BasicNode implements ExprNode, StmtNode {
 
     @Override
     public void semanticCheck() {
+        init.semanticCheck();
+        cond.semanticCheck();
+        body.semanticCheck();
 
     }
 
@@ -72,4 +75,5 @@ public class ForNode extends BasicNode implements ExprNode, StmtNode {
     public void printTree(PrintStream printStream) {
 
     }
+
 }

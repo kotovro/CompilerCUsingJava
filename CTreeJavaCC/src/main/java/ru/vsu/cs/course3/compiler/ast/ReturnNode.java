@@ -23,4 +23,9 @@ public class ReturnNode extends BasicNode implements ExprNode, StmtNode {
     public void initialize(Scope scope) {
 
     }
+
+    @Override
+    public Type getType() {
+        return expr.getType();
+    }
 }

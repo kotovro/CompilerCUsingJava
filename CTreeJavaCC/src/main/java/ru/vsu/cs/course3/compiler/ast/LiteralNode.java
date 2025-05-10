@@ -1,6 +1,7 @@
 package ru.vsu.cs.course3.compiler.ast;
 
 import ru.vsu.cs.course3.compiler.semantic.Scope;
+import ru.vsu.cs.course3.compiler.semantic.VariableType;
 
 public class LiteralNode extends BasicNode implements ExprNode {
     private String str;
@@ -36,5 +37,10 @@ public class LiteralNode extends BasicNode implements ExprNode {
     @Override
     public void initialize(Scope scope) {
 
+    }
+
+    @Override
+    public Type getType() {
+        return VariableType.getType(str);
     }
 }

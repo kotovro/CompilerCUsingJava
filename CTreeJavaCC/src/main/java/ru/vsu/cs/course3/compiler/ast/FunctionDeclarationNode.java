@@ -66,7 +66,7 @@ public class FunctionDeclarationNode extends BasicNode implements StmtNode {
         return body;
     }
 
-    public void setBody(StmtListNode body) {
+    public void setBody(StmtNode body) {
         this.body = body;
     }
 

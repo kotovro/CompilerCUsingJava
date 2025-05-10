@@ -1,11 +1,14 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.exceptions.SemanticException;
+import ru.vsu.cs.course3.compiler.semantic.NonOverlappingScope;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
+import ru.vsu.cs.course3.compiler.semantic.TypeConvertibility;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-public class WhileNode extends BasicNode implements ExprNode, StmtNode {
+public class WhileNode extends BasicNode implements StmtNode {
     private ExprNode cond = null;
     private StmtNode body = null;
 
@@ -34,11 +37,18 @@ public class WhileNode extends BasicNode implements ExprNode, StmtNode {
 
     @Override
     public void semanticCheck() {
-
+        cond.semanticCheck();
+        if (!cond.getType().equals(Type.BOOLEAN) && !TypeConvertibility.canConvert(cond.getType(), Type.BOOLEAN)) {
+            throw new SemanticException("If condition should be boolean");
+        }
+        body.semanticCheck();
     }
 
     @Override
     public void initialize(Scope scope) {
-
+        this.scope = new NonOverlappingScope(scope);
+        cond.initialize(this.scope);
+        body.initialize(this.scope);
     }
+
 }

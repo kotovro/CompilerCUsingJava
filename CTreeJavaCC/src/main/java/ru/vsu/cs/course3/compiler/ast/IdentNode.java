@@ -27,4 +27,9 @@ public class IdentNode extends BasicNode implements ExprNode {
     public void initialize(Scope scope) {
 
     }
+
+    @Override
+    public Type getType() {
+        return null;
+    }
 }
