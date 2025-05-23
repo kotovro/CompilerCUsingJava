@@ -1,9 +1,12 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.Function;
+import ru.vsu.cs.course3.compiler.semantic.LocalScope;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
+import ru.vsu.cs.course3.compiler.semantic.GlobalScope;
 
 import java.io.PrintStream;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -72,12 +75,37 @@ public class FunctionDeclarationNode extends BasicNode implements StmtNode {
 
     @Override
     public void semanticCheck() {
-
+        body.semanticCheck();
     }
 
     @Override
     public void initialize(Scope scope) {
+        ArrayList<Type> parameters = new ArrayList<>();
+        for (FunctionParamDeclarationNode functionParam: params) {
+            parameters.add(Type.fromString(functionParam.getType().toString()));
+        }
+        
+        Function function = new Function(name.getName(), parameters, Type.fromString(type.getName()));
+        
+        // Create new scope for function body
+        LocalScope functionScope = new LocalScope(scope);
+        this.scope = functionScope;
+        
+        // Add function to parent scope
+        scope.addFunction(function);
+        
+        // Set current function in the global scope
+        if (scope instanceof GlobalScope) {
+            ((GlobalScope) scope).setCurrentFunction(function);
+        }
 
+        // Initialize parameters in the function scope
+        for (FunctionParamDeclarationNode param : params) {
+            param.initialize(functionScope);
+        }
+
+        // Initialize body with the function scope
+        body.initialize(functionScope);
     }
 
 

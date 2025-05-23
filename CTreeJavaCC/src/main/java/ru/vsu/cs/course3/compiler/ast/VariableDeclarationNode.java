@@ -44,6 +44,7 @@ public class VariableDeclarationNode extends BasicNode implements StmtNode {
 
     @Override
     public void initialize(Scope scope) {
-
+        this.scope = scope;
+        this.scope.addVariable(identifier.getName(), Type.fromString(type.getName()));
     }
 }

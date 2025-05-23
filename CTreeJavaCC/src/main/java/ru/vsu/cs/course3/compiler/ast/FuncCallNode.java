@@ -2,6 +2,7 @@ package ru.vsu.cs.course3.compiler.ast;
 
 import ru.vsu.cs.course3.compiler.semantic.Function;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
+import ru.vsu.cs.course3.compiler.exceptions.SemanticException;
 
 import java.util.*;
 
@@ -34,14 +35,17 @@ public class FuncCallNode extends BasicNode implements ExprNode, StmtNode {
 
     @Override
     public void semanticCheck() {
-        if (func == null) {
-            ArrayList<Type> types = new ArrayList<>();
-            for (ExprNode arg : params) {
-                arg.semanticCheck();
-                types.add(arg.getType());
-            }
-            func = scope.getFunction(functionName.getName(), types);
+        ArrayList<Type> types = new ArrayList<>();
+        for (ExprNode arg : params) {
+            arg.semanticCheck();
+            types.add(arg.getType());
         }
+        try {
+            func = scope.getFunction(functionName.getName(), types);
+        } catch (SemanticException e) {
+            throw new SemanticException("Function '" + functionName.getName() + "' is not defined: " + e.getMessage());
+        }
+        
         for (int i = 0; i < params.size(); i++) {
             if (params.get(i).getType() != func.getParameters().get(i)) {
                 params.set(i, new CastNode(func.getParameters().get(i), params.get(i), scope));

@@ -1,6 +1,7 @@
 package ru.vsu.cs.course3.compiler.ast;
 
 import ru.vsu.cs.course3.compiler.exceptions.SemanticException;
+import ru.vsu.cs.course3.compiler.semantic.LocalScope;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
 import ru.vsu.cs.course3.compiler.semantic.TypeConvertibility;
 
@@ -54,7 +55,10 @@ public class IfNode extends BasicNode implements ExprNode, StmtNode {
 
     @Override
     public void initialize(Scope scope) {
-
+        this.scope = scope;
+        cond.initialize(scope);
+        thenStmt.initialize(new LocalScope(this.scope));
+        elseStmt.initialize(new LocalScope(this.scope));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.semantic.LocalScope;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
 
 import java.io.PrintStream;
@@ -61,12 +62,19 @@ public class ForNode extends BasicNode implements StmtNode {
         init.semanticCheck();
         cond.semanticCheck();
         body.semanticCheck();
+        step.semanticCheck();
 
     }
 
     @Override
     public void initialize(Scope scope) {
-
+        this.scope = new LocalScope(scope);
+        if (init != null) {
+            init.initialize(this.scope);
+        }
+        body.initialize(this.scope);
+        cond.initialize(this.scope);
+        step.initialize(this.scope);
     }
 
 

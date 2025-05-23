@@ -15,7 +15,8 @@ public class Program {
         Parser parser = new Parser(input);
 
         StmtListNode program = parser.program();
-        program.initialize(new GlobalScope());
+        GlobalScope scope = new GlobalScope();
+        program.initialize(scope);
         program.semanticCheck();
         System.out.println("Ended semantic check");
 //        Parser parser = new Parser(input);

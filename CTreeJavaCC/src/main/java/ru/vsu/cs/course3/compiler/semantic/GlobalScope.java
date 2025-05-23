@@ -11,10 +11,24 @@ import java.util.TreeSet;
 public class GlobalScope implements Scope {
     private Set<Variable> variables;
     private Set<Function> functions;
+    private Function currentFunction;
 
     public GlobalScope() {
         variables = new TreeSet<>();
         functions = new TreeSet<>();
+        currentFunction = null;
+    }
+
+    public void setCurrentFunction(Function function) {
+        this.currentFunction = function;
+    }
+
+    @Override
+    public Type getCurrentFunctionReturnType() {
+        if (currentFunction == null) {
+            throw new SemanticException("Return statement outside of function");
+        }
+        return currentFunction.getReturnType();
     }
 
     @Override

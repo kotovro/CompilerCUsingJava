@@ -1,7 +1,7 @@
 package ru.vsu.cs.course3.compiler.ast;
 
 import ru.vsu.cs.course3.compiler.exceptions.SemanticException;
-import ru.vsu.cs.course3.compiler.semantic.NonOverlappingScope;
+import ru.vsu.cs.course3.compiler.semantic.LocalScope;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
 import ru.vsu.cs.course3.compiler.semantic.TypeConvertibility;
 
@@ -46,8 +46,8 @@ public class WhileNode extends BasicNode implements StmtNode {
 
     @Override
     public void initialize(Scope scope) {
-        this.scope = new NonOverlappingScope(scope);
-        cond.initialize(this.scope);
+        this.scope = new LocalScope(scope);
+        cond.initialize(scope);
         body.initialize(this.scope);
     }
 

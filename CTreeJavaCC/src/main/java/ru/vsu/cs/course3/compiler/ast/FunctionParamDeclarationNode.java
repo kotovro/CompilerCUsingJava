@@ -21,11 +21,11 @@ public class FunctionParamDeclarationNode extends BasicNode implements AstNode{
 
     @Override
     public void semanticCheck() {
-
+        identifier.semanticCheck();
     }
 
     @Override
     public void initialize(Scope scope) {
-
+        identifier.initialize(scope);
     }
 }

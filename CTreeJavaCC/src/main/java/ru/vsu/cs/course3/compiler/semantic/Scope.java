@@ -11,5 +11,5 @@ public interface Scope {
     boolean contains(Variable var);
     void addFunction(Function function);
     Function getFunction(String name, List<Type> types);
-
+    Type getCurrentFunctionReturnType();
 }

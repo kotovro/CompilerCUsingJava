@@ -48,6 +48,7 @@ public class BinaryOpNode extends BasicNode implements ExprNode {
         arg1.semanticCheck();
         arg2.semanticCheck();
 
+        System.out.println(arg2.getType());
         for (var types : op.supportableTypes()) {
             if (arg1.getType().equals(types.typeLeft) && arg2.getType().equals(types.typeRight)) {
                 type = op.getReturnType(arg1.getType(), arg2.getType());
@@ -75,6 +76,8 @@ public class BinaryOpNode extends BasicNode implements ExprNode {
     @Override
     public void initialize(Scope scope) {
         this.scope = scope;
+        arg1.initialize(scope);
+        arg2.initialize(scope);
     }
 
 

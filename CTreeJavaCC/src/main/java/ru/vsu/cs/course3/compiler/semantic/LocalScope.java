@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class OverlappingScope implements Scope{
+public class LocalScope implements Scope{
     private Scope parent;
     private Set<Variable> variables;
 
-    public OverlappingScope(Scope parent) {
+    public LocalScope(Scope parent) {
         this.parent = parent;
         variables = new TreeSet<>();
     }
@@ -44,5 +44,10 @@ public class OverlappingScope implements Scope{
     @Override
     public Function getFunction(String name, List<Type> parameters) {
         return parent.getFunction(name, parameters);
+    }
+
+    @Override
+    public Type getCurrentFunctionReturnType() {
+        return parent.getCurrentFunctionReturnType();
     }
 }
