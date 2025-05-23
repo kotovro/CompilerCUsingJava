@@ -36,6 +36,6 @@ int main() {
     else {
         q = 3;
     }
-    return ;
+    return q + a;
 
 }
