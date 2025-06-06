@@ -12,6 +12,8 @@ public class GlobalScope implements Scope {
     private Set<Variable> variables;
     private Set<Function> functions;
     private Function currentFunction;
+    private int labelCounter = 0;
+    private int operatorCounter = 0;
 
     public GlobalScope() {
         variables = new TreeSet<>();
@@ -83,7 +85,7 @@ public class GlobalScope implements Scope {
 
     @Override
     public void addVariable(String name, Type type) throws SemanticException {
-        Variable i = new Variable(name.toLowerCase(), type);
+        Variable i = new Variable(name.toLowerCase(), type, ScopeType.GLOBAL, 0);
         if (variables.contains(i)) throw new SemanticException("Variable is already declared");
         variables.add(i);
     }
@@ -91,5 +93,20 @@ public class GlobalScope implements Scope {
     @Override
     public boolean contains(Variable var) {
         return variables.contains(var);
+    }
+
+    @Override
+    public int getFreeLabelIdentifier() {
+        return labelCounter++;
+    }
+
+    @Override
+    public int getFreeOperatorIdentifier() {
+        return operatorCounter++;
+    }
+
+    @Override
+    public int getTotalLocals() {
+        return 0; // Global scope has no local variables
     }
 }

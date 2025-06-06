@@ -12,4 +12,7 @@ public interface Scope {
     void addFunction(Function function);
     Function getFunction(String name, List<Type> types);
     Type getCurrentFunctionReturnType();
+    int getFreeOperatorIdentifier();
+    int getFreeLabelIdentifier();
+    int getTotalLocals();
 }

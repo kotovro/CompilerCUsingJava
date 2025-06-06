@@ -9,7 +9,9 @@ import java.util.TreeSet;
 
 public class LocalScope implements Scope{
     private Scope parent;
-    private Set<Variable> variables;
+    public Set<Variable> variables;
+    private int operatorCounter = 0;
+    private int labelCounter = 0;
 
     public LocalScope(Scope parent) {
         this.parent = parent;
@@ -26,7 +28,7 @@ public class LocalScope implements Scope{
 
     @Override
     public void addVariable(String name, Type type) {
-        Variable i = new Variable(name.toLowerCase(), type);
+        Variable i = new Variable(name.toLowerCase(), type, ScopeType.LOCAL, variables.size());
         if (variables.contains(i)) throw new SemanticException("Variable is already declared: " + name);
         variables.add(i);
     }
@@ -49,5 +51,27 @@ public class LocalScope implements Scope{
     @Override
     public Type getCurrentFunctionReturnType() {
         return parent.getCurrentFunctionReturnType();
+    }
+
+    public Set<Variable> getVariables() {
+        return variables;
+    }
+
+    @Override
+    public int getTotalLocals() {
+        // Assuming variables set includes parameters and local variables
+        return variables.size();
+    }
+
+    @Override
+    public int getFreeOperatorIdentifier() {
+        // Local scope might need temporary variable identifiers
+        return operatorCounter++;
+    }
+
+    @Override
+    public int getFreeLabelIdentifier() {
+        // Local scope needs its own label identifiers
+        return labelCounter++;
     }
 }

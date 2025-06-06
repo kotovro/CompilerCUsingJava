@@ -7,6 +7,7 @@ import ru.vsu.cs.course3.compiler.semantic.TypeConvertibility;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.lang.StringBuilder;
 
 public class WhileNode extends BasicNode implements StmtNode {
     private ExprNode cond = null;
@@ -51,4 +52,29 @@ public class WhileNode extends BasicNode implements StmtNode {
         body.initialize(this.scope);
     }
 
+    @Override
+    public StringBuilder generateCode() {
+        StringBuilder code = new StringBuilder();
+        int labelId = scope.getFreeLabelIdentifier();
+        String startLabel = "While_Start_" + labelId;
+        String endLabel = "While_End_" + labelId;
+
+        // While loop start label
+        code.append(startLabel).append(":\n");
+
+        // Condition check
+        code.append(cond.generateCode());
+        code.append("ifeq ").append(endLabel).append("\n");
+
+        // Loop body
+        code.append(body.generateCode());
+
+        // Jump back to condition check
+        code.append("goto ").append(startLabel).append("\n");
+
+        // While loop end label
+        code.append(endLabel).append(":\n");
+
+        return code;
+    }
 }

@@ -40,4 +40,8 @@ public class CastNode  extends BasicNode implements ExprNode {
         return toType;
     }
 
+    @Override
+    public StringBuilder generateCode() {
+        return new StringBuilder().append(TypeConvertibility.generateCode(expr.getType(), toType));
+    }
 }

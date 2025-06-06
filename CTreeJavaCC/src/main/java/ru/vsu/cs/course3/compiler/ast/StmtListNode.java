@@ -48,4 +48,12 @@ public class StmtListNode extends BasicNode implements StmtNode {
         }
     }
 
+    @Override
+    public StringBuilder generateCode() {
+        StringBuilder code = new StringBuilder();
+        for (StmtNode stmt : stmts) {
+            code.append(stmt.generateCode());
+        }
+        return code;
+    }
 }

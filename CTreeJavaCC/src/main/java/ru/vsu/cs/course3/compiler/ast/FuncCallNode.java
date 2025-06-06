@@ -5,11 +5,14 @@ import ru.vsu.cs.course3.compiler.semantic.Scope;
 import ru.vsu.cs.course3.compiler.exceptions.SemanticException;
 
 import java.util.*;
+import java.lang.StringBuilder;
 
 public class FuncCallNode extends BasicNode implements ExprNode, StmtNode {
     private IdentNode functionName = null;
     private List<ExprNode> params = null;
     Function func = null;
+    private Scope scope;
+    private Type returnType;
 
     public FuncCallNode(IdentNode functionName, Collection<ExprNode> params) {
         this.functionName = functionName;
@@ -21,7 +24,10 @@ public class FuncCallNode extends BasicNode implements ExprNode, StmtNode {
 
     @Override
     public Collection<? extends AstNode> childs() {
-        return params;
+        List<AstNode> children = new ArrayList<>();
+        children.add(functionName);
+        children.addAll(params);
+        return children;
     }
 
     @Override
@@ -35,13 +41,12 @@ public class FuncCallNode extends BasicNode implements ExprNode, StmtNode {
 
     @Override
     public void semanticCheck() {
-        ArrayList<Type> types = new ArrayList<>();
-        for (ExprNode arg : params) {
-            arg.semanticCheck();
-            types.add(arg.getType());
+        functionName.semanticCheck();
+        for (ExprNode param : params) {
+            param.semanticCheck();
         }
         try {
-            func = scope.getFunction(functionName.getName(), types);
+            func = scope.getFunction(functionName.getName(), getParamTypes());
         } catch (SemanticException e) {
             throw new SemanticException("Function '" + functionName.getName() + "' is not defined: " + e.getMessage());
         }
@@ -56,8 +61,9 @@ public class FuncCallNode extends BasicNode implements ExprNode, StmtNode {
     @Override
     public void initialize(Scope scope) {
         this.scope = scope;
-        for (ExprNode arg : params) {
-            arg.initialize(scope);
+        functionName.initialize(scope);
+        for (ExprNode param : params) {
+            param.initialize(scope);
         }
     }
 
@@ -71,5 +77,28 @@ public class FuncCallNode extends BasicNode implements ExprNode, StmtNode {
             func = scope.getFunction(functionName.getName(), types);
         }
         return func.getReturnType();
+    }
+
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+
+    private List<Type> getParamTypes() {
+        List<Type> types = new ArrayList<>();
+        for (ExprNode param : params) {
+            types.add(param.getType());
+        }
+        return types;
+    }
+
+    @Override
+    public StringBuilder generateCode() {
+        StringBuilder code = new StringBuilder();
+        params.forEach(e -> code.append(e.generateCode()));
+        code.append("invokestatic ").append(func.getName()).append("(");
+        func.getParameters().forEach(e -> code.append(e.toString()));
+        code.append(")").append(func.getReturnType().toString()).append("\n");
+
+        return code;
     }
 }

@@ -6,6 +6,7 @@ import ru.vsu.cs.course3.compiler.semantic.TypeConvertibility;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.lang.StringBuilder;
 
 public class BinaryOpNode extends BasicNode implements ExprNode {
 
@@ -60,9 +61,11 @@ public class BinaryOpNode extends BasicNode implements ExprNode {
                     && (arg2.getType().equals(types.typeRight) || TypeConvertibility.canConvert(arg2.getType(), types.typeRight))) {
                 if (!arg1.getType().equals(types.typeLeft)) {
                     arg1 = new CastNode(types.typeLeft, arg1, scope);
+                    arg1.initialize(scope);
                 }
-                if (!arg2.getType().equals(types.typeLeft)) {
+                if (!arg2.getType().equals(types.typeRight)) {
                     arg2 = new CastNode(types.typeRight, arg2, scope);
+                    arg2.initialize(scope);
                 }
 
                 type = op.getReturnType(arg1.getType(), arg2.getType());
@@ -79,9 +82,23 @@ public class BinaryOpNode extends BasicNode implements ExprNode {
         arg2.initialize(scope);
     }
 
-
     @Override
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public StringBuilder generateCode() {
+        StringBuilder code = new StringBuilder();
+
+        // Generate code for the operands (pushing their values onto the stack)
+        code.append(arg1.generateCode());
+        code.append(arg2.generateCode());
+
+        // Get and append the Jasmin code for the operation
+        // Use the types after potential implicit conversions inserted during semanticCheck
+        code.append(op.getOperatorCode(arg1.getType(), arg2.getType(), scope));
+
+        return code;
     }
 }

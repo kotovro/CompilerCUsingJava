@@ -48,4 +48,16 @@ public class ReturnNode extends BasicNode implements ExprNode, StmtNode {
     public Type getType() {
         return expr != null ? expr.getType() : null;
     }
+
+    @Override
+    public StringBuilder generateCode() {
+        StringBuilder code = new StringBuilder();
+        if (expr != null) {
+            code.append(expr.generateCode());
+            code.append(expr.getType().getCommandWordPrefix()).append("return\n");
+        } else {
+            code.append("return\n");
+        }
+        return code;
+    }
 }

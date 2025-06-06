@@ -8,34 +8,7 @@ int f = 3;
 
 int main() {
 
-    f += 1;
-
-    for(int a = 0; a < 3; a++){}
-    // test();
-    // int main()
-    char m;
-
-
-
-    int a = 9;
-    int b = 3;
-    int c = 3;
-    int q = 2;
-    int d = 2;
-    int l = 2;
-    int f = 4;
-    int h = 18;
-
-    c = a + b * (2.05 - 1) + 0;  // comment 2
-    if (a || f <= 3) {
-      a();
-    } else if (h < 3) {
-        d = 4;
-        l = 4;
-    }
-    else {
-        q = 3;
-    }
-    return q + a;
+    int f = 3;
+    return f;
 
 }

@@ -27,4 +27,9 @@ public class TypeNode extends BasicNode implements AstNode {
     public void initialize(Scope scope) {
 
     }
+
+    @Override
+    public StringBuilder generateCode() {
+        return new StringBuilder();
+    }
 }

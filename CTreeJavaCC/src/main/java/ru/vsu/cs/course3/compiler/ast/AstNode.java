@@ -10,4 +10,5 @@ public interface AstNode {
     void initialize(final Scope scope);
     Collection<String> tree();
     void printTree(PrintStream printStream);
+    StringBuilder generateCode();
 }

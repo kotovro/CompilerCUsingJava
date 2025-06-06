@@ -6,11 +6,13 @@ import ru.vsu.cs.course3.compiler.semantic.Scope;
 import ru.vsu.cs.course3.compiler.semantic.TypeConvertibility;
 
 import java.util.*;
+import java.io.PrintStream;
 
 public class IfNode extends BasicNode implements ExprNode, StmtNode {
     private ExprNode cond = null;
     private StmtNode thenStmt = null;
     private StmtNode elseStmt = null;
+    private Scope scope;
 
     public IfNode(ExprNode cond, StmtNode thenStmt, StmtNode elseStmt) {
         this.cond = cond;
@@ -50,7 +52,10 @@ public class IfNode extends BasicNode implements ExprNode, StmtNode {
         if (!cond.getType().equals(Type.BOOLEAN) && !TypeConvertibility.canConvert(cond.getType(), Type.BOOLEAN)) {
             throw new SemanticException("If condition should be boolean");
         }
-        elseStmt.semanticCheck();
+        thenStmt.semanticCheck();
+        if (elseStmt != null) {
+            elseStmt.semanticCheck();
+        }
     }
 
     @Override
@@ -58,11 +63,35 @@ public class IfNode extends BasicNode implements ExprNode, StmtNode {
         this.scope = scope;
         cond.initialize(scope);
         thenStmt.initialize(new LocalScope(this.scope));
-        elseStmt.initialize(new LocalScope(this.scope));
+        if (elseStmt != null) {
+            elseStmt.initialize(new LocalScope(this.scope));
+        }
     }
 
     @Override
     public Type getType() {
         return null; //not needed
+    }
+
+    @Override
+    public StringBuilder generateCode() {
+        StringBuilder code = new StringBuilder();
+        int labelId = scope.getFreeLabelIdentifier();
+        String elseLabel = "Else_" + labelId;
+        String endLabel = "EndIf_" + labelId;
+        code.append(cond.generateCode());
+        if (elseStmt != null) {
+            code.append("ifeq ").append(elseLabel).append("\n");
+        } else {
+            code.append("ifeq ").append(endLabel).append("\n");
+        }
+        code.append(thenStmt.generateCode());
+        if (elseStmt != null) {
+            code.append("goto ").append(endLabel).append("\n");
+            code.append(elseLabel).append(":\n");
+            code.append(elseStmt.generateCode());
+        }
+        code.append(endLabel).append(":\n");
+        return code;
     }
 }

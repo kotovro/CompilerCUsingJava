@@ -28,4 +28,9 @@ public class FunctionParamDeclarationNode extends BasicNode implements AstNode{
     public void initialize(Scope scope) {
         identifier.initialize(scope);
     }
+
+    @Override
+    public StringBuilder generateCode() {
+        return new StringBuilder();
+    }
 }

@@ -32,13 +32,6 @@ public class FunctionDeclarationNode extends BasicNode implements StmtNode {
     @Override
     public List<AstNode> childs() {
         return Collections.singletonList(body);
-//        List<BasicNode> astNodes = new ArrayList<>();
-//        List<BasicNode> groupNodes = new ArrayList<>();
-//        groupNodes.add(this.name);
-//        astNodes.add(new GroupNode(this.type.toString(), groupNodes));
-//        astNodes.add(new GroupNode("params", new ArrayList<>(this.params)));
-//        astNodes.add(this.body);
-//        return astNodes;
     }
 
     public TypeNode getType() {
@@ -87,30 +80,58 @@ public class FunctionDeclarationNode extends BasicNode implements StmtNode {
         
         Function function = new Function(name.getName(), parameters, Type.fromString(type.getName()));
         
-        // Create new scope for function body
         LocalScope functionScope = new LocalScope(scope);
         this.scope = functionScope;
         
-        // Add function to parent scope
         scope.addFunction(function);
         
-        // Set current function in the global scope
         if (scope instanceof GlobalScope) {
             ((GlobalScope) scope).setCurrentFunction(function);
         }
 
-        // Initialize parameters in the function scope
         for (FunctionParamDeclarationNode param : params) {
             param.initialize(functionScope);
         }
 
-        // Initialize body with the function scope
         body.initialize(functionScope);
     }
 
 
-    @Override
-    public void printTree(PrintStream printStream) {
 
+    private List<Type> getParamTypes() {
+        List<Type> types = new ArrayList<>();
+        if (params != null) {
+            for (FunctionParamDeclarationNode param : params) {
+                types.add(Type.fromString(param.getType().getName()));
+            }
+        }
+        return types;
+    }
+
+    @Override
+    public StringBuilder generateCode() {
+        StringBuilder code = new StringBuilder();
+        Type returnType = Type.fromString(this.type.getName());
+        code.append(".method public static ").append(name.getName()).append("(");
+        if (params != null) {
+            for (FunctionParamDeclarationNode param : params) {
+                code.append(Type.fromString(param.getType().getName()).getAbbreviation());
+            }
+        }
+        code.append(")").append(returnType.getAbbreviation()).append("\n");
+        code.append(".limit stack 20\n"); // TODO: Calculate proper stack limit
+        code.append(".limit locals ").append(((LocalScope)scope).variables.size()).append("\n"); // Assuming params are also local vars
+        code.append(body.generateCode());
+
+        // Handle return based on return type
+        if (returnType != Type.VOID) {
+             // Assuming the return value is on top of the stack after body execution
+             code.append(returnType.getCommandWordPrefix()).append("return\n");
+        } else {
+             code.append("return\n");
+        }
+
+        code.append(".end method\n\n");
+        return code;
     }
 }

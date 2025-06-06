@@ -1,7 +1,9 @@
 package ru.vsu.cs.course3.compiler.ast;
 
+import ru.vsu.cs.course3.compiler.exceptions.SemanticException;
 import ru.vsu.cs.course3.compiler.semantic.LocalScope;
 import ru.vsu.cs.course3.compiler.semantic.Scope;
+import ru.vsu.cs.course3.compiler.semantic.TypeConvertibility;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -32,7 +34,6 @@ public class ForNode extends BasicNode implements StmtNode {
         if (step != null) {
             nodes.add(step);
         }
-
         return nodes;
     }
 
@@ -59,11 +60,19 @@ public class ForNode extends BasicNode implements StmtNode {
 
     @Override
     public void semanticCheck() {
-        init.semanticCheck();
-        cond.semanticCheck();
+        if (init != null) {
+            init.semanticCheck();
+        }
+        if (cond != null) {
+            cond.semanticCheck();
+            if (!cond.getType().equals(Type.BOOLEAN) && !TypeConvertibility.canConvert(cond.getType(), Type.BOOLEAN)) {
+                throw new SemanticException("For loop condition must be boolean");
+            }
+        }
         body.semanticCheck();
-        step.semanticCheck();
-
+        if (step != null) {
+            step.semanticCheck();
+        }
     }
 
     @Override
@@ -73,15 +82,17 @@ public class ForNode extends BasicNode implements StmtNode {
             init.initialize(this.scope);
         }
         body.initialize(this.scope);
-        cond.initialize(this.scope);
-        step.initialize(this.scope);
+        if (cond != null) {
+            cond.initialize(this.scope);
+        }
+        if (step != null) {
+            step.initialize(this.scope);
+        }
     }
-
 
 
     @Override
     public void printTree(PrintStream printStream) {
-
+        // Implementation not needed for code generation
     }
-
 }
