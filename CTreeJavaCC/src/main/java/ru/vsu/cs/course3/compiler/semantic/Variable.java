@@ -25,7 +25,6 @@ public class Variable implements Comparable<Variable> {
         this.type = type;
         this.name = name;
         this.identifier = identifier;
-        this.global = true;
     }
 
 

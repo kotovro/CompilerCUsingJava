@@ -17,6 +17,11 @@ public class UnaryOperationNode extends BasicNode implements ExprNode, StmtNode{
     }
 
     @Override
+    public StringBuilder generateCode() {
+        return null;
+    }
+
+    @Override
     public Type getType() {
         return null;
     }

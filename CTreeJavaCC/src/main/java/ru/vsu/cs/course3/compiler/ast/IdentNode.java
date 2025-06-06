@@ -33,6 +33,11 @@ public class IdentNode extends BasicNode implements ExprNode {
     }
 
     @Override
+    public StringBuilder generateCode() {
+        return new StringBuilder("place holder!!! from ident node");
+    }
+
+    @Override
     public Type getType() {
         return scope.getVariable(name).getType();
     }

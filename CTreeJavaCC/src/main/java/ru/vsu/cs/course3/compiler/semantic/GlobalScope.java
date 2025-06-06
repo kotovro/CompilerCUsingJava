@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class GlobalScope implements Scope {
+public class  GlobalScope implements Scope {
     private Set<Variable> variables;
     private Set<Function> functions;
     private Function currentFunction;
@@ -108,5 +108,9 @@ public class GlobalScope implements Scope {
     @Override
     public int getTotalLocals() {
         return 0; // Global scope has no local variables
+    }
+
+    public Set<Variable> getVariables() {
+        return variables;
     }
 }

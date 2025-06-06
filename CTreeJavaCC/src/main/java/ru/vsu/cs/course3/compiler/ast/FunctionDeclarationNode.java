@@ -119,13 +119,12 @@ public class FunctionDeclarationNode extends BasicNode implements StmtNode {
             }
         }
         code.append(")").append(returnType.getAbbreviation()).append("\n");
-        code.append(".limit stack 20\n"); // TODO: Calculate proper stack limit
-        code.append(".limit locals ").append(((LocalScope)scope).variables.size()).append("\n"); // Assuming params are also local vars
+        code.append(".limit stack 20\n");
+        code.append(".limit locals ").append(((LocalScope)scope).variables.size()).append("\n"); 
         code.append(body.generateCode());
 
         // Handle return based on return type
         if (returnType != Type.VOID) {
-             // Assuming the return value is on top of the stack after body execution
              code.append(returnType.getCommandWordPrefix()).append("return\n");
         } else {
              code.append("return\n");

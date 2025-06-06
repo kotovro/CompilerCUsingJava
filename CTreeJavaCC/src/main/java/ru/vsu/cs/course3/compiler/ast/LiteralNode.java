@@ -40,6 +40,11 @@ public class LiteralNode extends BasicNode implements ExprNode {
     }
 
     @Override
+    public StringBuilder generateCode() {
+        return null;
+    }
+
+    @Override
     public Type getType() {
         return VariableType.getType(str);
     }

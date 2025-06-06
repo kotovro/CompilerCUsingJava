@@ -95,4 +95,9 @@ public class ForNode extends BasicNode implements StmtNode {
     public void printTree(PrintStream printStream) {
         // Implementation not needed for code generation
     }
+
+    @Override
+    public StringBuilder generateCode() {
+        return null;
+    }
 }

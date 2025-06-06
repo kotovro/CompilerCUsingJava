@@ -47,4 +47,9 @@ public class VariableDeclarationNode extends BasicNode implements StmtNode {
         this.scope = scope;
         this.scope.addVariable(identifier.getName(), Type.fromString(type.getName()));
     }
+
+    @Override
+    public StringBuilder generateCode() {
+        return null;
+    }
 }
