@@ -14,6 +14,8 @@ public class  GlobalScope implements Scope {
     private Function currentFunction;
     private int labelCounter = 0;
     private int operatorCounter = 0;
+    private int maxElseIdentifier = 0;
+
 
     public GlobalScope() {
         variables = new TreeSet<>();
@@ -113,4 +115,9 @@ public class  GlobalScope implements Scope {
     public Set<Variable> getVariables() {
         return variables;
     }
+    @Override
+    public int getElseIdentifier() {
+        return maxElseIdentifier++;
+    }
+
 }

@@ -1,8 +1,6 @@
 package ru.vsu.cs.course3.compiler.ast;
 
 import ru.vsu.cs.course3.compiler.semantic.Scope;
-import ru.vsu.cs.course3.compiler.semantic.LocalScope;
-
 import java.util.*;
 
 public class StmtListNode extends BasicNode implements StmtNode {

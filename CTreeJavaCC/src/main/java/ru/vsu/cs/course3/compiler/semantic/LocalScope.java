@@ -12,6 +12,7 @@ public class LocalScope implements Scope{
     public Set<Variable> variables;
     private int operatorCounter = 0;
     private int labelCounter = 0;
+    private int maxElseIdentifier = 0;
 
     public LocalScope(Scope parent) {
         this.parent = parent;
@@ -59,19 +60,21 @@ public class LocalScope implements Scope{
 
     @Override
     public int getTotalLocals() {
-        // Assuming variables set includes parameters and local variables
         return variables.size();
     }
 
     @Override
     public int getFreeOperatorIdentifier() {
-        // Local scope might need temporary variable identifiers
         return operatorCounter++;
     }
 
     @Override
+    public int getElseIdentifier() {
+        return maxElseIdentifier++;
+    }
+
+    @Override
     public int getFreeLabelIdentifier() {
-        // Local scope needs its own label identifiers
         return labelCounter++;
     }
 }

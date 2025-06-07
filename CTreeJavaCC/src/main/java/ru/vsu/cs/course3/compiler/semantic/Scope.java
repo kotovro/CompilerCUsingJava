@@ -15,4 +15,6 @@ public interface Scope {
     int getFreeOperatorIdentifier();
     int getFreeLabelIdentifier();
     int getTotalLocals();
+    int getElseIdentifier();
+
 }

@@ -76,22 +76,11 @@ public class IfNode extends BasicNode implements ExprNode, StmtNode {
     @Override
     public StringBuilder generateCode() {
         StringBuilder code = new StringBuilder();
-        int labelId = scope.getFreeLabelIdentifier();
-        String elseLabel = "Else_" + labelId;
-        String endLabel = "EndIf_" + labelId;
         code.append(cond.generateCode());
-        if (elseStmt != null) {
-            code.append("ifeq ").append(elseLabel).append("\n");
-        } else {
-            code.append("ifeq ").append(endLabel).append("\n");
-        }
+        StringBuilder elseMarker = new StringBuilder().append("ELSE").append(scope.getElseIdentifier());
+        code.append("ifeq ").append(elseMarker).append("\n");
         code.append(thenStmt.generateCode());
-        if (elseStmt != null) {
-            code.append("goto ").append(endLabel).append("\n");
-            code.append(elseLabel).append(":\n");
-            code.append(elseStmt.generateCode());
-        }
-        code.append(endLabel).append(":\n");
+        code.append(elseMarker).append(":\n");
         return code;
     }
 }

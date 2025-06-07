@@ -31,6 +31,8 @@ public class FunctionParamDeclarationNode extends BasicNode implements AstNode{
 
     @Override
     public StringBuilder generateCode() {
-        return new StringBuilder();
+        StringBuilder code = new StringBuilder();
+        identifier.generateCode();
+        return code;
     }
 }

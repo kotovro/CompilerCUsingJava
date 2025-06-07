@@ -90,15 +90,8 @@ public class BinaryOpNode extends BasicNode implements ExprNode {
     @Override
     public StringBuilder generateCode() {
         StringBuilder code = new StringBuilder();
-
-        // Generate code for the operands (pushing their values onto the stack)
         code.append(arg1.generateCode());
         code.append(arg2.generateCode());
-
-        // Get and append the Jasmin code for the operation
-        // Use the types after potential implicit conversions inserted during semanticCheck
         code.append(op.getOperatorCode(arg1.getType(), arg2.getType(), scope));
-
-        return code;
-    }
+        return code;    }
 }

@@ -15,7 +15,6 @@ public class UnaryOperationNode extends BasicNode implements ExprNode, StmtNode{
     public void initialize(Scope scope) {
 
     }
-
     @Override
     public StringBuilder generateCode() {
         return null;

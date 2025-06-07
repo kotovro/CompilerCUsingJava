@@ -45,7 +45,7 @@ public class ValueNode extends BasicNode implements ExprNode {
 
     @Override
     public StringBuilder generateCode() {
-        return null;
+        return new StringBuilder();
     }
 
     @Override

@@ -34,7 +34,7 @@ public class IdentNode extends BasicNode implements ExprNode {
 
     @Override
     public StringBuilder generateCode() {
-        return new StringBuilder("place holder!!! from ident node");
+        return new StringBuilder();
     }
 
     @Override
